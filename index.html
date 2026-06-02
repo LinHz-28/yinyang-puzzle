@@ -157,6 +157,15 @@
   .arcane.bright { stroke: var(--amber-2); opacity: 0.9; }
   .arcane.faint { opacity: 0.45; }
   .arcane.ticks { stroke: var(--amber-2); opacity: 0.7; }
+
+  /* 法陣旋轉層 */
+  .spin { transform-box: fill-box; transform-origin: center; }
+  .spin-cw-slow  { animation: spin-cw  140s linear infinite; }
+  .spin-cw-med   { animation: spin-cw   85s linear infinite; }
+  .spin-ccw-slow { animation: spin-ccw 180s linear infinite; }
+  .spin-ccw-med  { animation: spin-ccw 110s linear infinite; }
+  @keyframes spin-cw  { to { transform: rotate(360deg);  } }
+  @keyframes spin-ccw { to { transform: rotate(-360deg); } }
   .glyph {
     fill: var(--amber-3);
     font-family: 'Ma Shan Zheng', serif;
@@ -422,21 +431,36 @@
     <rect x="0" y="0" width="400" height="460" fill="url(#dust)"/>
 
     <!-- ───── 法陣 ───── -->
+    <!-- 靜止層：最外圍與固定邊界 -->
     <g class="arcane">
       <circle cx="200" cy="235" r="210" stroke-width="0.8"/>
-      <circle cx="200" cy="235" r="176" stroke-width="0.6" stroke-dasharray="2 4"/>
     </g>
     <g class="arcane bright">
       <circle cx="200" cy="235" r="148" stroke-width="0.7"/>
-      <circle cx="200" cy="235" r="56"  stroke-width="0.7"/>
-      <circle cx="200" cy="235" r="40"  stroke-width="0.6" stroke-dasharray="1 3"/>
     </g>
-    <g class="arcane ticks" id="ticks" stroke-width="0.7"></g>
     <g class="arcane faint">
       <circle cx="200" cy="235" r="100" stroke-width="0.5"/>
       <circle cx="200" cy="235" r="240" stroke-width="0.5"/>
+    </g>
+
+    <!-- 旋轉層：外圈虛線（順時針慢） -->
+    <g class="arcane spin spin-cw-slow">
+      <circle cx="200" cy="235" r="176" stroke-width="0.6" stroke-dasharray="2 4"/>
+    </g>
+    <!-- 旋轉層：24 等分刻度（順時針慢，同向） -->
+    <g class="arcane ticks spin spin-cw-slow" id="ticks" stroke-width="0.7"></g>
+    <!-- 旋轉層：內方框（逆時針慢） -->
+    <g class="arcane faint spin spin-ccw-slow">
       <rect x="80"  y="115" width="240" height="240" stroke-width="0.6"/>
+    </g>
+    <!-- 旋轉層：內方框虛線（順時針中速） -->
+    <g class="arcane faint spin spin-cw-med">
       <rect x="105" y="140" width="190" height="190" stroke-width="0.5" stroke-dasharray="2 3"/>
+    </g>
+    <!-- 旋轉層：核心圈（逆時針中速） -->
+    <g class="arcane bright spin spin-ccw-med">
+      <circle cx="200" cy="235" r="56"  stroke-width="0.7"/>
+      <circle cx="200" cy="235" r="40"  stroke-width="0.6" stroke-dasharray="1 3"/>
     </g>
     <!-- 四象方位字 -->
     <g class="glyph" text-anchor="middle">
@@ -567,50 +591,43 @@
       g.appendChild(ns('path', { d:d2, fill:'#a8e0c0', opacity: 0.6 }));
     }
     else if (a.type === 'moon') {
-      // 弦月：外圓 R，內挖小圓（中心左偏），形成新月／弦月形
+      // 弦月：外圓挖內圓 → 厚實 C 形；白邊 + 白色輻射缺口
       const cx = a.x, cy = a.y;
       const R  = 14;
-      const r  = 11;
-      const dx = 5; // 內圓中心向左偏移 → 開口朝左、肉在右
+      const r  = 10;
+      const dx = 8;   // 內圓中心向左偏移：肉厚朝右、開口朝左
       // 兩圓交點 (相對 cx,cy)
-      const ix = (r*r - R*R - dx*dx) / (-2 * dx); // 注意：內圓中心 (cx-dx, cy)
-      // 推導：外圓 x²+y² = R²；內圓 (x-(-dx))² + y² = (x+dx)²+y² = r²
-      // 相減：2dx·x + dx² = r² - R² → x = (r²-R²-dx²)/(2dx)
       const xi = (r*r - R*R - dx*dx) / (2*dx);
       const yi = Math.sqrt(R*R - xi*xi);
       const p1 = { x: cx + xi, y: cy - yi };
       const p2 = { x: cx + xi, y: cy + yi };
-      // 外弧大弧順時針 + 內弧小弧逆時針回起點
       const d = `M ${p1.x} ${p1.y}
                  A ${R} ${R} 0 1 1 ${p2.x} ${p2.y}
                  A ${r} ${r} 0 0 0 ${p1.x} ${p1.y} Z`;
-      g.appendChild(ns('path', { d, fill:'var(--violet)', filter:'url(#glow-anchor)' }));
+      // 紫肉 + 白邊
+      g.appendChild(ns('path', { d, fill:'var(--violet)',
+        stroke:'#ffffff', 'stroke-width': 1.6, 'stroke-linejoin':'round',
+        filter:'url(#glow-anchor)' }));
 
-      // 4 道輻射缺口（與背景同色）
-      const cuts = [-72, -24, 24, 72];
+      // 4 道白色輻射缺口
+      const cuts = [-78, -28, 28, 78];
       cuts.forEach(deg => {
         const rad = deg * Math.PI / 180;
-        // 缺口起點：徑向上接觸內圓邊界處
         const cosT = Math.cos(rad), sinT = Math.sin(rad);
-        // t² + 2dx·cosT·t + dx² - r² = 0 → 對內圓中心 (cx-dx, cy)
-        // 從 (cx,cy) 沿方向走 t 後距內圓中心 = r
-        // (t·cosT + dx)² + (t·sinT)² = r²
-        // t² + 2·dx·cosT·t + dx² - r² = 0
+        // 從 (cx,cy) 沿徑向到內圓邊界的 t
         const B = 2 * dx * cosT;
         const C = dx*dx - r*r;
-        const t1 = (-B + Math.sqrt(B*B - 4*C)) / 2; // 取正解
-        const x1c = cx + t1 * cosT - 0.6 * cosT;
-        const y1c = cy + t1 * sinT - 0.6 * sinT;
-        const x2c = cx + (R + 1) * cosT;
-        const y2c = cy + (R + 1) * sinT;
+        const t1 = (-B + Math.sqrt(B*B - 4*C)) / 2;
+        // 缺口起點略往內延伸到內邊界外側、終點略超出外圓
+        const x1c = cx + (t1 - 0.4) * cosT;
+        const y1c = cy + (t1 - 0.4) * sinT;
+        const x2c = cx + (R + 0.8) * cosT;
+        const y2c = cy + (R + 0.8) * sinT;
         g.appendChild(ns('line', {
           x1: x1c, y1: y1c, x2: x2c, y2: y2c,
-          stroke: CUT_COLOR, 'stroke-width': 2.4, 'stroke-linecap': 'butt'
+          stroke: '#ffffff', 'stroke-width': 2.2, 'stroke-linecap': 'butt'
         }));
       });
-
-      // 月暈高光
-      g.appendChild(ns('circle', { cx: cx + 8, cy: cy - 6, r: 1.6, fill: 'var(--violet-2)', opacity: 0.9 }));
     }
     else if (a.type === 'square') {
       const cx = a.x, cy = a.y;
