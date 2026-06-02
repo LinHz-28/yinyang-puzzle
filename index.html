@@ -210,34 +210,43 @@
     0%,100% { filter: drop-shadow(0 0 4px rgba(232,58,40,1))    drop-shadow(0 0 12px rgba(255,106,68,0.7)); }
     50%     { filter: drop-shadow(0 0 8px rgba(232,58,40,1))    drop-shadow(0 0 20px rgba(255,128,96,0.9)); }
   }
-  /* 過關時 HOPE 飄浮發光 */
+  /* 過關時 HOPE 飄起 → 聚向中央 → 金光綻放 */
   .letter.lit.victory {
+    --dx: 0px;
+    --dy: 0px;
     transform-box: fill-box;
     transform-origin: center;
+    fill: #ffe89a;
     font-size: 26px;
-    fill: #ffd6a0;
     animation:
-      victoryFloat 2.4s ease-in-out infinite alternate,
-      victoryGlow  1.6s ease-in-out infinite;
+      victoryAssemble 2.8s cubic-bezier(.55,.1,.25,1) forwards,
+      goldGlow         1.8s ease-in-out infinite;
   }
-  @keyframes victoryFloat {
-    0%   { transform: translateY(0)    scale(1);    }
-    100% { transform: translateY(-10px) scale(1.18); }
+  @keyframes victoryAssemble {
+    0%   { transform: translate(0, 0) scale(1); }
+    18%  { transform: translate(0, -14px) scale(1.25); }
+    45%  { transform: translate(0, -14px) scale(1.25); }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1.85); }
   }
-  @keyframes victoryGlow {
+  @keyframes goldGlow {
     0%,100% {
-      fill: #ffd6a0;
+      fill: #ffd870;
       filter:
-        drop-shadow(0 0 6px rgba(255,170,90,0.9))
-        drop-shadow(0 0 18px rgba(232,58,40,0.8));
+        drop-shadow(0 0 6px rgba(255,210,90,0.95))
+        drop-shadow(0 0 18px rgba(255,170,40,0.7));
     }
     50% {
-      fill: #fff3d8;
+      fill: #fff5d0;
       filter:
-        drop-shadow(0 0 12px rgba(255,200,120,1))
-        drop-shadow(0 0 30px rgba(255,90,58,0.95))
-        drop-shadow(0 0 50px rgba(255,128,80,0.7));
+        drop-shadow(0 0 14px rgba(255,230,140,1))
+        drop-shadow(0 0 32px rgba(255,190,70,0.95))
+        drop-shadow(0 0 60px rgba(255,150,40,0.7));
     }
+  }
+  /* 過關時其它字母淡出，讓 HOPE 主舞台明顯 */
+  .letter.dimmed {
+    opacity: 0.10;
+    transition: opacity 1s ease-out;
   }
 
   /* 朱線 ─ 全紅 */
@@ -855,16 +864,27 @@
     if (isWin) {
       answerEl.textContent = 'HOPE';
       coreEye.classList.add('on');
-      // HOPE 四字依序飄起來發亮（每字錯開 0.25s）
-      ['H','O','P','E'].forEach((ch, i) => {
+
+      // 其它字母淡入背景，讓 HOPE 主舞台浮現
+      LETTERS.forEach(L => {
+        if (!['H','O','P','E'].includes(L.c)) L._el.classList.add('dimmed');
+      });
+
+      // HOPE 四字聚向中央：先在原處騰起發金光，再緩緩飄至中央排列
+      const CENTER_X = 200, CENTER_Y = 240, SPACING = 34;
+      const order = ['H','O','P','E'];
+      order.forEach((ch, i) => {
         const L = LETTERS.find(l => l.c === ch);
         if (!L) return;
-        setTimeout(() => {
-          L._el.style.animationDelay = `0s, 0s`;
-          L._el.classList.add('victory');
-        }, i * 250);
+        const targetX = CENTER_X + (i - (order.length - 1) / 2) * SPACING;
+        const targetY = CENTER_Y;
+        L._el.style.setProperty('--dx', `${targetX - L.x}px`);
+        L._el.style.setProperty('--dy', `${targetY - L.y}px`);
+        setTimeout(() => L._el.classList.add('victory'), i * 280);
       });
-      setTimeout(() => winEl.classList.add('show'), 2200);
+
+      // 等四字全部聚成 HOPE 之後再彈出大字幕
+      setTimeout(() => winEl.classList.add('show'), 4200);
     }
   }
 
@@ -877,7 +897,14 @@
     linesG.innerHTML   = '';
     previewG.innerHTML = '';
     sparksG.innerHTML  = '';
-    LETTERS.forEach(L => { L._el.classList.remove('lit'); L._el.classList.remove('victory'); L._el.style.animationDelay = ''; });
+    LETTERS.forEach(L => {
+      L._el.classList.remove('lit');
+      L._el.classList.remove('victory');
+      L._el.classList.remove('dimmed');
+      L._el.style.animationDelay = '';
+      L._el.style.removeProperty('--dx');
+      L._el.style.removeProperty('--dy');
+    });
     ANCHORS.forEach(a => { a._g.classList.remove('selected'); a._g.classList.remove('connected'); });
     answerEl.textContent = '　';
     winEl.classList.remove('show');
