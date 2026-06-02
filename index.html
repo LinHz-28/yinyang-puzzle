@@ -591,36 +591,42 @@
       g.appendChild(ns('path', { d:d2, fill:'#a8e0c0', opacity: 0.6 }));
     }
     else if (a.type === 'moon') {
-      // 弦月：外圓挖內圓 → 厚實 C 形；白邊 + 白色輻射缺口
+      // 弦月：外圓挖內圓 → 厚實 C 形；缺口朝左上方
       const cx = a.x, cy = a.y;
-      const R  = 14;
-      const r  = 10;
-      const dx = 8;   // 內圓中心向左偏移：肉厚朝右、開口朝左
-      // 兩圓交點 (相對 cx,cy)
-      const xi = (r*r - R*R - dx*dx) / (2*dx);
-      const yi = Math.sqrt(R*R - xi*xi);
-      const p1 = { x: cx + xi, y: cy - yi };
-      const p2 = { x: cx + xi, y: cy + yi };
+      const R    = 14;
+      const r    = 11;        // 內挖圓半徑（加大 → 缺口大一些）
+      const dMag = 9;         // 內圓中心離外圓中心的距離
+      const offDeg = 210;     // 偏移方向（SVG 角度 0=右、180=左、210=左上方）
+      const offAng = offDeg * Math.PI / 180;
+      const ox = dMag * Math.cos(offAng);   // ≈ -7.79
+      const oy = dMag * Math.sin(offAng);   // ≈ -4.5   (SVG y 朝下，負值=上)
+      // 兩圓交點：foot ± h·v
+      const a_   = (R*R - r*r + dMag*dMag) / (2 * dMag);
+      const h    = Math.sqrt(R*R - a_*a_);
+      const ux = ox / dMag,  uy = oy / dMag;     // 偏移方向單位向量
+      const vx = -uy,        vy = ux;            // 垂直方向單位向量
+      const fx = a_ * ux,    fy = a_ * uy;       // 交點連線中點
+      const p1 = { x: cx + fx + h*vx, y: cy + fy + h*vy };
+      const p2 = { x: cx + fx - h*vx, y: cy + fy - h*vy };
+
       const d = `M ${p1.x} ${p1.y}
                  A ${R} ${R} 0 1 1 ${p2.x} ${p2.y}
                  A ${r} ${r} 0 0 0 ${p1.x} ${p1.y} Z`;
-      // 紫肉 + 白邊
       g.appendChild(ns('path', { d, fill:'var(--violet)',
         stroke:'#ffffff', 'stroke-width': 1.6, 'stroke-linejoin':'round',
         filter:'url(#glow-anchor)' }));
 
-      // 4 道白色輻射缺口
-      const cuts = [-78, -28, 28, 78];
-      cuts.forEach(deg => {
-        const rad = deg * Math.PI / 180;
-        const cosT = Math.cos(rad), sinT = Math.sin(rad);
+      // 4 道白色輻射缺口，以「身體中軸」(與偏移反向) 為中心對稱
+      const bodyDeg = offDeg - 180;            // ≈ 30°
+      const cutOffsets = [-78, -28, 28, 78];
+      cutOffsets.forEach(off => {
+        const ang = (bodyDeg + off) * Math.PI / 180;
+        const cosT = Math.cos(ang), sinT = Math.sin(ang);
         // 從 (cx,cy) 沿徑向到內圓邊界的 t
-        const B = 2 * dx * cosT;
-        const C = dx*dx - r*r;
-        const t1 = (-B + Math.sqrt(B*B - 4*C)) / 2;
-        // 缺口起點略往內延伸到內邊界外側、終點略超出外圓
-        const x1c = cx + (t1 - 0.4) * cosT;
-        const y1c = cy + (t1 - 0.4) * sinT;
+        const k = ox * cosT + oy * sinT;
+        const t1 = k + Math.sqrt(k*k - dMag*dMag + r*r);
+        const x1c = cx + (t1 - 0.3) * cosT;
+        const y1c = cy + (t1 - 0.3) * sinT;
         const x2c = cx + (R + 0.8) * cosT;
         const y2c = cy + (R + 0.8) * sinT;
         g.appendChild(ns('line', {
