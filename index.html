@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>食妖陰陽師 · 希望之印</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coffee-0:   #0a0604;   /* 最深 */
+    --coffee-1:   #1c0f08;
+    --coffee-2:   #2a1810;
+    --coffee-3:   #3d2516;   /* 紙面中心 */
+    --amber-1:    #b07a44;   /* 法陣線 */
+    --amber-2:    #d4a665;   /* 法陣亮 */
+    --amber-3:    #f0c98a;   /* 法陣最亮 */
+    --cream:      #e8c89a;   /* 字母基色 */
+    --red-1:      #b8201a;
+    --red-2:      #e83a28;   /* 朱線主色 */
+    --red-3:      #ff6a44;   /* 朱線核心 */
+    --red-glow:   #ff8060;
+    --jade:       #4ea27a;
+    --jade-dark:  #2c5440;
+    --violet:     #8a5ad0;   /* 月相 */
+    --violet-2:   #b890e8;
+    --indigo:     #5074d4;   /* 玄武 */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 25% 15%, rgba(200,40,31,0.10), transparent 55%),
+      radial-gradient(ellipse at 75% 85%, rgba(80,90,160,0.08), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, var(--coffee-1) 0%, var(--coffee-0) 100%);
+    color: var(--amber-2);
+    font-family: 'Noto Serif TC', 'Cinzel', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    cursor: default;
+  }
+
+  .stage {
+    position: relative;
+    width: 500px;
+    max-width: 100%;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(80,40,20,0.45), transparent 35%),
+      radial-gradient(circle at 82% 78%, rgba(40,20,10,0.55), transparent 40%),
+      radial-gradient(circle at 50% 50%, var(--coffee-3) 0%, var(--coffee-2) 55%, var(--coffee-1) 100%);
+    border: 1.5px solid var(--amber-1);
+    box-shadow:
+      0 0 80px rgba(232,58,40,0.18),
+      0 30px 60px rgba(0,0,0,0.6),
+      inset 0 0 100px rgba(10,5,2,0.55),
+      inset 0 0 30px rgba(5,2,1,0.4);
+    padding: 28px 24px 22px;
+    border-radius: 6px;
+  }
+
+  /* 四角符 */
+  .corner {
+    position: absolute;
+    width: 30px; height: 30px;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .corner.tl { top: 8px; left: 8px;   border-top: 1.5px solid var(--amber-2); border-left: 1.5px solid var(--amber-2); }
+  .corner.tr { top: 8px; right: 8px;  border-top: 1.5px solid var(--amber-2); border-right:1.5px solid var(--amber-2); }
+  .corner.bl { bottom: 8px; left: 8px;border-bottom:1.5px solid var(--amber-2); border-left:1.5px solid var(--amber-2); }
+  .corner.br { bottom: 8px; right: 8px;border-bottom:1.5px solid var(--amber-2); border-right:1.5px solid var(--amber-2); }
+
+  .seal {
+    position: absolute;
+    top: 14px; right: 22px;
+    width: 44px; height: 44px;
+    border: 2px solid var(--red-2);
+    color: var(--red-3);
+    font-family: 'Ma Shan Zheng', 'Noto Serif TC', serif;
+    font-size: 22px;
+    line-height: 40px;
+    text-align: center;
+    transform: rotate(-6deg);
+    opacity: 0.85;
+    box-shadow:
+      inset 0 0 8px rgba(232,58,40,0.5),
+      0 0 14px rgba(232,58,40,0.35);
+    text-shadow: 0 0 6px rgba(232,58,40,0.6);
+    pointer-events: none;
+  }
+
+  .brush-tag {
+    position: absolute;
+    top: 16px; left: 22px;
+    color: var(--red-3);
+    font-family: 'Ma Shan Zheng', 'Noto Serif TC', serif;
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    opacity: 0.9;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-shadow: 0 0 6px rgba(232,58,40,0.5);
+  }
+  .brush-tag svg { width: 22px; height: 22px; }
+
+  .title-row {
+    text-align: center;
+    margin-bottom: 4px;
+    color: var(--amber-2);
+    letter-spacing: 0.45em;
+    font-size: 12px;
+    font-weight: 600;
+    text-indent: 0.45em;
+    opacity: 0.85;
+  }
+  .title-main {
+    text-align: center;
+    color: var(--red-3);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 0.55em;
+    margin-bottom: 6px;
+    text-indent: 0.55em;
+    font-family: 'Ma Shan Zheng', 'Noto Serif TC', serif;
+    text-shadow:
+      0 0 12px rgba(232,58,40,0.6),
+      0 0 24px rgba(232,58,40,0.25);
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--amber-2);
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-indent: 0.32em;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+
+  svg.board {
+    display: block;
+    width: 100%;
+    height: auto;
+    touch-action: none;
+    cursor:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><circle cx='6' cy='22' r='2.8' fill='%23ff3a2a'/><path d='M6 22 L20 8' stroke='%23e8c89a' stroke-width='2' stroke-linecap='round'/><path d='M19 7 L23 5 L21 9 Z' fill='%23e8c89a'/></svg>") 4 24,
+      crosshair;
+  }
+
+  /* 法陣裝飾 */
+  .arcane { stroke: var(--amber-1); fill: none; opacity: 0.8; }
+  .arcane.bright { stroke: var(--amber-2); opacity: 0.9; }
+  .arcane.faint { opacity: 0.45; }
+  .arcane.ticks { stroke: var(--amber-2); opacity: 0.7; }
+  .glyph {
+    fill: var(--amber-3);
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 12px;
+    opacity: 0.78;
+    user-select: none;
+  }
+
+  .anchor { cursor: pointer; transition: filter 0.25s; }
+  .anchor:hover { filter: drop-shadow(0 0 10px var(--amber-3)) brightness(1.1); }
+  .anchor.selected { filter: drop-shadow(0 0 14px var(--red-2)) drop-shadow(0 0 6px var(--red-2)); }
+  .anchor.connected { filter: drop-shadow(0 0 8px rgba(232,58,40,0.65)); }
+  .anchor-halo {
+    fill: var(--red-2);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .anchor.selected .anchor-halo { opacity: 0.18; }
+
+  /* 字母 */
+  .letter {
+    font-family: 'Cinzel', 'Georgia', serif;
+    font-size: 17px;
+    font-weight: 600;
+    fill: var(--cream);
+    user-select: none;
+    transition: fill 0.45s, filter 0.45s, font-size 0.4s;
+    pointer-events: none;
+    opacity: 0.78;
+  }
+  .letter.lit {
+    fill: var(--red-3);
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 4px rgba(232,58,40,1))
+      drop-shadow(0 0 12px rgba(255,106,68,0.7));
+    font-weight: 700;
+    font-size: 19px;
+    animation: letterPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes letterPulse {
+    0%,100% { filter: drop-shadow(0 0 4px rgba(232,58,40,1))    drop-shadow(0 0 12px rgba(255,106,68,0.7)); }
+    50%     { filter: drop-shadow(0 0 8px rgba(232,58,40,1))    drop-shadow(0 0 20px rgba(255,128,96,0.9)); }
+  }
+
+  /* 朱線 ─ 全紅 */
+  .seal-line {
+    stroke: var(--red-2);
+    stroke-width: 2.4;
+    fill: none;
+    stroke-linecap: round;
+    filter: url(#glow-strong);
+    opacity: 1;
+  }
+  .seal-line.core {
+    stroke: var(--red-3);
+    stroke-width: 1.1;
+    filter: none;
+    opacity: 0.95;
+    pointer-events: none;
+  }
+  .preview-line {
+    stroke: var(--red-2);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 5;
+    fill: none;
+    opacity: 0.8;
+    pointer-events: none;
+    filter: url(#glow-soft);
+  }
+  .spark {
+    fill: var(--red-glow);
+    filter: url(#glow-strong);
+  }
+
+  /* 中央陣眼 */
+  .core-eye {
+    fill: none;
+    stroke: var(--red-2);
+    stroke-width: 0.8;
+    opacity: 0;
+    transition: opacity 0.6s;
+    filter: drop-shadow(0 0 4px rgba(232,58,40,0.7));
+  }
+  .core-eye.on { opacity: 0.85; }
+
+  .footer {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+    gap: 12px;
+  }
+  .footer .label {
+    color: var(--amber-2);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    margin-right: 6px;
+    text-indent: 0.3em;
+    opacity: 0.85;
+  }
+  .answer-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(212,166,101,0.35);
+    padding: 4px 2px 6px;
+  }
+  .answer-display {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    letter-spacing: 0.5em;
+    color: var(--red-3);
+    font-weight: 700;
+    text-indent: 0.5em;
+    min-height: 28px;
+    text-shadow: 0 0 8px rgba(232,58,40,0.5);
+  }
+  button {
+    background: transparent;
+    border: 1px solid var(--amber-1);
+    color: var(--amber-2);
+    padding: 6px 14px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-indent: 0.25em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  button:hover {
+    background: rgba(232,58,40,0.12);
+    color: var(--red-3);
+    border-color: var(--red-2);
+  }
+
+  /* 過關 */
+  .win-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(232,58,40,0.25) 0%, transparent 45%),
+      radial-gradient(circle, rgba(15,7,3,0.95) 30%, rgba(5,2,1,0.99) 100%);
+    color: var(--cream);
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.9s ease;
+    overflow: hidden;
+  }
+  .win-overlay.show { opacity: 1; pointer-events: auto; }
+  .win-overlay .ring {
+    position: absolute;
+    width: 340px; height: 340px;
+    border: 1px dashed rgba(232,58,40,0.55);
+    border-radius: 50%;
+    animation: rotate 22s linear infinite;
+    box-shadow: 0 0 40px rgba(232,58,40,0.3) inset;
+  }
+  .win-overlay .ring.inner {
+    width: 230px; height: 230px;
+    border-style: solid;
+    border-color: rgba(232,58,40,0.35);
+    animation-direction: reverse;
+    animation-duration: 14s;
+  }
+  .win-overlay .ring.outer-glow {
+    width: 420px; height: 420px;
+    border: 1px solid rgba(232,58,40,0.22);
+    animation-duration: 36s;
+  }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+
+  .win-overlay .hanzi {
+    font-family: 'Ma Shan Zheng','Noto Serif TC',serif;
+    font-size: 100px;
+    color: var(--red-3);
+    letter-spacing: 0.25em;
+    text-indent: 0.25em;
+    text-shadow:
+      0 0 24px rgba(232,58,40,0.95),
+      0 0 60px rgba(232,58,40,0.55);
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .win-overlay .en {
+    font-family: 'Cinzel', serif;
+    font-size: 30px;
+    letter-spacing: 0.85em;
+    text-indent: 0.85em;
+    color: var(--cream);
+    margin-bottom: 22px;
+    position: relative;
+  }
+  .win-overlay .quote {
+    font-size: 13px;
+    color: var(--amber-2);
+    letter-spacing: 0.32em;
+    text-indent: 0.32em;
+    opacity: 0.92;
+    position: relative;
+    margin-bottom: 22px;
+  }
+  .win-overlay button {
+    color: var(--amber-2);
+    border-color: var(--amber-2);
+    position: relative;
+  }
+  .win-overlay button:hover {
+    background: rgba(232,58,40,0.18);
+    color: var(--red-3);
+    border-color: var(--red-2);
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="seal">印</div>
+  <div class="brush-tag">
+    <svg viewBox="0 0 24 24"><circle cx="5" cy="19" r="2.4" fill="#ff3a2a"/><path d="M5 19 L18 6" stroke="#e8c89a" stroke-width="1.8" stroke-linecap="round"/><path d="M17 5 L21 3 L19 7 Z" fill="#e8c89a"/></svg>
+    朱 筆
+  </div>
+
+  <div class="title-row">食 妖 陰 陽 師</div>
+  <div class="title-main">希望之印</div>
+  <div class="subtitle">執朱筆 · 連四象 · 喚字成印</div>
+
+  <svg id="board" class="board" viewBox="0 0 400 460" aria-label="連線解謎">
+    <defs>
+      <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.4" result="b1"/>
+        <feGaussianBlur stdDeviation="5" in="SourceGraphic" result="b2"/>
+        <feMerge>
+          <feMergeNode in="b2"/>
+          <feMergeNode in="b1"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="1.8"/>
+      </filter>
+      <filter id="glow-anchor" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="1.2"/>
+      </filter>
+      <pattern id="dust" patternUnits="userSpaceOnUse" width="50" height="50">
+        <circle cx="6"  cy="9"  r="0.4" fill="#f0c98a" opacity="0.10"/>
+        <circle cx="28" cy="14" r="0.3" fill="#f0c98a" opacity="0.09"/>
+        <circle cx="40" cy="6"  r="0.35" fill="#f0c98a" opacity="0.08"/>
+        <circle cx="13" cy="36" r="0.35" fill="#f0c98a" opacity="0.09"/>
+        <circle cx="34" cy="40" r="0.3" fill="#f0c98a" opacity="0.08"/>
+      </pattern>
+    </defs>
+
+    <!-- 紙紋 -->
+    <rect x="0" y="0" width="400" height="460" fill="url(#dust)"/>
+
+    <!-- ───── 法陣 ───── -->
+    <g class="arcane">
+      <circle cx="200" cy="235" r="210" stroke-width="0.8"/>
+      <circle cx="200" cy="235" r="176" stroke-width="0.6" stroke-dasharray="2 4"/>
+    </g>
+    <g class="arcane bright">
+      <circle cx="200" cy="235" r="148" stroke-width="0.7"/>
+      <circle cx="200" cy="235" r="56"  stroke-width="0.7"/>
+      <circle cx="200" cy="235" r="40"  stroke-width="0.6" stroke-dasharray="1 3"/>
+    </g>
+    <g class="arcane ticks" id="ticks" stroke-width="0.7"></g>
+    <g class="arcane faint">
+      <circle cx="200" cy="235" r="100" stroke-width="0.5"/>
+      <circle cx="200" cy="235" r="240" stroke-width="0.5"/>
+      <rect x="80"  y="115" width="240" height="240" stroke-width="0.6"/>
+      <rect x="105" y="140" width="190" height="190" stroke-width="0.5" stroke-dasharray="2 3"/>
+    </g>
+    <!-- 四象方位字 -->
+    <g class="glyph" text-anchor="middle">
+      <text x="200" y="22">朱</text>
+      <text x="18"  y="225">青</text>
+      <text x="382" y="225">白</text>
+      <text x="200" y="455">玄</text>
+    </g>
+
+    <!-- 中央陣眼 -->
+    <g id="coreEye" class="core-eye">
+      <circle cx="200" cy="235" r="18"/>
+      <circle cx="200" cy="235" r="10"/>
+      <path d="M200 217 L200 253 M182 235 L218 235" />
+      <circle cx="200" cy="235" r="2.5" fill="var(--red-2)" stroke="none"/>
+    </g>
+
+    <!-- 朱線層 -->
+    <g id="lines"></g>
+    <g id="sparks"></g>
+    <g id="preview"></g>
+    <g id="letters"></g>
+    <g id="anchors"></g>
+  </svg>
+
+  <div class="footer">
+    <span class="label">咒</span>
+    <div class="answer-box">
+      <div id="answer" class="answer-display">　</div>
+    </div>
+    <button id="reset" type="button">收筆重啟</button>
+  </div>
+
+  <div id="win" class="win-overlay">
+    <div class="ring outer-glow"></div>
+    <div class="ring"></div>
+    <div class="ring inner"></div>
+    <div class="hanzi">希望</div>
+    <div class="en">HOPE</div>
+    <div class="quote">執燈穿暗　引心向光</div>
+    <button id="restart" type="button">再啟符陣</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  // 取得 coffee 色（為了讓月相缺口能融入背景）
+  const CUT_COLOR = getComputedStyle(document.documentElement).getPropertyValue('--coffee-2').trim() || '#2a1810';
+
+  const ANCHORS = [
+    { id: 'top',    x: 200, y: 60,  type: 'ring'    },
+    { id: 'left',   x: 50,  y: 220, type: 'diamond' },
+    { id: 'right',  x: 350, y: 220, type: 'moon'    },
+    { id: 'bottom', x: 200, y: 410, type: 'square'  },
+  ];
+
+  const LETTERS = [
+    { c: 'H', x: 140, y: 120 },
+    { c: 'O', x: 175, y: 218 },
+    { c: 'P', x: 200, y: 250 },
+    { c: 'E', x: 260, y: 120 },
+    { c: 'I', x: 158, y: 145 },
+    { c: 'F', x: 238, y: 150 },
+    { c: 'L', x: 263, y: 168 },
+    { c: 'D', x: 90,  y: 255 },
+    { c: 'A', x: 138, y: 305 },
+    { c: 'N', x: 60,  y: 335 },
+    { c: 'C', x: 235, y: 265 },
+    { c: 'B', x: 290, y: 270 },
+    { c: 'M', x: 233, y: 290 },
+    { c: 'G', x: 225, y: 340 },
+    { c: 'J', x: 170, y: 370 },
+    { c: 'K', x: 310, y: 380 },
+  ];
+
+  const TOL = 14;
+
+  const svg       = document.getElementById('board');
+  const linesG    = document.getElementById('lines');
+  const sparksG   = document.getElementById('sparks');
+  const previewG  = document.getElementById('preview');
+  const lettersG  = document.getElementById('letters');
+  const anchorsG  = document.getElementById('anchors');
+  const ticksG    = document.getElementById('ticks');
+  const coreEye   = document.getElementById('coreEye');
+  const answerEl  = document.getElementById('answer');
+  const winEl     = document.getElementById('win');
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const ns = (tag, attrs) => {
+    const el = document.createElementNS(SVGNS, tag);
+    if (attrs) for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  };
+
+  // 法陣 24 等分刻度
+  (function buildTicks() {
+    const cx = 200, cy = 235, r1 = 158, r2 = 168;
+    for (let i = 0; i < 24; i++) {
+      const ang = (i / 24) * Math.PI * 2 - Math.PI / 2;
+      const long = (i % 6 === 0);
+      const x1 = cx + Math.cos(ang) * r1;
+      const y1 = cy + Math.sin(ang) * r1;
+      const x2 = cx + Math.cos(ang) * (long ? r2 + 6 : r2);
+      const y2 = cy + Math.sin(ang) * (long ? r2 + 6 : r2);
+      const line = ns('line', { x1, y1, x2, y2 });
+      if (long) line.setAttribute('stroke-width', '1.2');
+      ticksG.appendChild(line);
+    }
+  })();
+
+  // ───────── 錨點繪製 ─────────
+  function drawAnchor(g, a) {
+    g.appendChild(ns('circle', { cx: a.x, cy: a.y, r: 22, class: 'anchor-halo' }));
+
+    if (a.type === 'ring') {
+      // 朱雀眼：雙環
+      g.appendChild(ns('circle', { cx:a.x, cy:a.y, r:14, fill:'none',
+        stroke:'var(--red-2)', 'stroke-width':2.6, filter:'url(#glow-anchor)' }));
+      g.appendChild(ns('circle', { cx:a.x, cy:a.y, r:14, fill:'none', stroke:'var(--red-3)', 'stroke-width':1 }));
+      g.appendChild(ns('circle', { cx:a.x, cy:a.y, r:6,  fill:'none', stroke:'var(--red-2)', 'stroke-width':2 }));
+    }
+    else if (a.type === 'diamond') {
+      const d  = `M ${a.x} ${a.y-14} L ${a.x+14} ${a.y} L ${a.x} ${a.y+14} L ${a.x-14} ${a.y} Z`;
+      const d2 = `M ${a.x} ${a.y-5}  L ${a.x+5}  ${a.y} L ${a.x} ${a.y+5}  L ${a.x-5}  ${a.y} Z`;
+      g.appendChild(ns('path', { d, fill:'var(--jade)', stroke:'var(--jade-dark)', 'stroke-width':1.5,
+        filter:'url(#glow-anchor)' }));
+      g.appendChild(ns('path', { d:d2, fill:'#a8e0c0', opacity: 0.6 }));
+    }
+    else if (a.type === 'moon') {
+      // 弦月：外圓 R，內挖小圓（中心左偏），形成新月／弦月形
+      const cx = a.x, cy = a.y;
+      const R  = 14;
+      const r  = 11;
+      const dx = 5; // 內圓中心向左偏移 → 開口朝左、肉在右
+      // 兩圓交點 (相對 cx,cy)
+      const ix = (r*r - R*R - dx*dx) / (-2 * dx); // 注意：內圓中心 (cx-dx, cy)
+      // 推導：外圓 x²+y² = R²；內圓 (x-(-dx))² + y² = (x+dx)²+y² = r²
+      // 相減：2dx·x + dx² = r² - R² → x = (r²-R²-dx²)/(2dx)
+      const xi = (r*r - R*R - dx*dx) / (2*dx);
+      const yi = Math.sqrt(R*R - xi*xi);
+      const p1 = { x: cx + xi, y: cy - yi };
+      const p2 = { x: cx + xi, y: cy + yi };
+      // 外弧大弧順時針 + 內弧小弧逆時針回起點
+      const d = `M ${p1.x} ${p1.y}
+                 A ${R} ${R} 0 1 1 ${p2.x} ${p2.y}
+                 A ${r} ${r} 0 0 0 ${p1.x} ${p1.y} Z`;
+      g.appendChild(ns('path', { d, fill:'var(--violet)', filter:'url(#glow-anchor)' }));
+
+      // 4 道輻射缺口（與背景同色）
+      const cuts = [-72, -24, 24, 72];
+      cuts.forEach(deg => {
+        const rad = deg * Math.PI / 180;
+        // 缺口起點：徑向上接觸內圓邊界處
+        const cosT = Math.cos(rad), sinT = Math.sin(rad);
+        // t² + 2dx·cosT·t + dx² - r² = 0 → 對內圓中心 (cx-dx, cy)
+        // 從 (cx,cy) 沿方向走 t 後距內圓中心 = r
+        // (t·cosT + dx)² + (t·sinT)² = r²
+        // t² + 2·dx·cosT·t + dx² - r² = 0
+        const B = 2 * dx * cosT;
+        const C = dx*dx - r*r;
+        const t1 = (-B + Math.sqrt(B*B - 4*C)) / 2; // 取正解
+        const x1c = cx + t1 * cosT - 0.6 * cosT;
+        const y1c = cy + t1 * sinT - 0.6 * sinT;
+        const x2c = cx + (R + 1) * cosT;
+        const y2c = cy + (R + 1) * sinT;
+        g.appendChild(ns('line', {
+          x1: x1c, y1: y1c, x2: x2c, y2: y2c,
+          stroke: CUT_COLOR, 'stroke-width': 2.4, 'stroke-linecap': 'butt'
+        }));
+      });
+
+      // 月暈高光
+      g.appendChild(ns('circle', { cx: cx + 8, cy: cy - 6, r: 1.6, fill: 'var(--violet-2)', opacity: 0.9 }));
+    }
+    else if (a.type === 'square') {
+      const cx = a.x, cy = a.y;
+      const s1 = 14;
+      g.appendChild(ns('rect', { x: cx-s1, y: cy-s1, width: s1*2, height: s1*2,
+                                  fill:'none', stroke:'var(--indigo)', 'stroke-width': 3.6,
+                                  filter:'url(#glow-anchor)' }));
+      const s2 = 8;
+      g.appendChild(ns('rect', { x: cx-s2, y: cy-s2, width: s2*2, height: s2*2,
+                                  fill:'none', stroke:'var(--indigo)', 'stroke-width': 2.2 }));
+      const s3 = 3;
+      g.appendChild(ns('rect', { x: cx-s3, y: cy-s3, width: s3*2, height: s3*2,
+                                  fill:'var(--indigo)' }));
+      g.appendChild(ns('rect', { x: cx-1, y: cy-1, width: 2, height: 2, fill: CUT_COLOR }));
+    }
+
+    // 透明 hit area
+    g.appendChild(ns('circle', { cx:a.x, cy:a.y, r:26, fill:'transparent' }));
+  }
+
+  ANCHORS.forEach(a => {
+    const g = ns('g', { class:'anchor', 'data-id':a.id });
+    drawAnchor(g, a);
+    g.addEventListener('pointerdown', e => onPointerDown(e, a));
+    g.addEventListener('click',       e => onAnchorClick(e, a));
+    anchorsG.appendChild(g);
+    a._g = g;
+  });
+
+  // 字母
+  LETTERS.forEach(L => {
+    const t = ns('text', { x:L.x, y:L.y, class:'letter', 'text-anchor':'middle', 'dominant-baseline':'central' });
+    t.textContent = L.c;
+    lettersG.appendChild(t);
+    L._el = t;
+  });
+
+  // 幾何
+  function distPtSeg(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const len2 = dx*dx + dy*dy;
+    if (len2 === 0) return Math.hypot(px - x1, py - y1);
+    let t = ((px - x1) * dx + (py - y1) * dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const cx = x1 + t*dx, cy = y1 + t*dy;
+    return Math.hypot(px - cx, py - cy);
+  }
+  function svgPoint(evt) {
+    const rect = svg.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    return {
+      x: (evt.clientX - rect.left) * (vb.width  / rect.width),
+      y: (evt.clientY - rect.top)  * (vb.height / rect.height),
+    };
+  }
+
+  // 狀態
+  let selected = null;
+  let dragging = null;
+  let previewLine = null;
+  let suppressClick = false;
+  const connections = [];
+  const drawOrder = [];
+
+  const key = (a, b) => [a, b].sort().join('-');
+
+  // 互動
+  function onPointerDown(e, a) {
+    e.preventDefault();
+    dragging = a;
+    suppressClick = false;
+    previewLine = ns('line', { x1:a.x, y1:a.y, x2:a.x, y2:a.y, class:'preview-line' });
+    previewG.appendChild(previewLine);
+    svg.setPointerCapture(e.pointerId);
+    svg.addEventListener('pointermove', onPointerMove);
+    svg.addEventListener('pointerup',   onPointerUp);
+    svg.addEventListener('pointercancel', onPointerUp);
+  }
+  function onPointerMove(e) {
+    if (!previewLine) return;
+    suppressClick = true;
+    const p = svgPoint(e);
+    previewLine.setAttribute('x2', p.x);
+    previewLine.setAttribute('y2', p.y);
+  }
+  function onPointerUp(e) {
+    svg.removeEventListener('pointermove', onPointerMove);
+    svg.removeEventListener('pointerup',   onPointerUp);
+    svg.removeEventListener('pointercancel', onPointerUp);
+    if (previewLine) { previewLine.remove(); previewLine = null; }
+    if (!dragging) return;
+    const start = dragging;
+    dragging = null;
+    if (!suppressClick) return;
+    const p = svgPoint(e);
+    let near = null, bestD = 32;
+    for (const a of ANCHORS) {
+      const d = Math.hypot(p.x - a.x, p.y - a.y);
+      if (d < bestD) { bestD = d; near = a; }
+    }
+    if (near && near.id !== start.id) {
+      addConnection(start.id, near.id);
+    }
+  }
+  function onAnchorClick(e, a) {
+    if (suppressClick) { suppressClick = false; return; }
+    if (!selected) {
+      selected = a.id;
+      updateSelected();
+    } else if (selected === a.id) {
+      selected = null;
+      updateSelected();
+    } else {
+      addConnection(selected, a.id);
+      selected = null;
+      updateSelected();
+    }
+  }
+  function updateSelected() {
+    ANCHORS.forEach(a => a._g.classList.toggle('selected', a.id === selected));
+  }
+
+  // 加入連線
+  function addConnection(idA, idB) {
+    const k = key(idA, idB);
+    if (connections.some(c => c.key === k)) return;
+    const A = ANCHORS.find(x => x.id === idA);
+    const B = ANCHORS.find(x => x.id === idB);
+
+    const line = ns('line', { x1:A.x, y1:A.y, x2:B.x, y2:B.y, class:'seal-line' });
+    const core = ns('line', { x1:A.x, y1:A.y, x2:B.x, y2:B.y, class:'seal-line core' });
+
+    const len = Math.hypot(B.x - A.x, B.y - A.y);
+    [line, core].forEach(l => {
+      l.style.strokeDasharray  = len;
+      l.style.strokeDashoffset = len;
+      l.style.transition = 'stroke-dashoffset 0.65s ease-out';
+    });
+    linesG.appendChild(line);
+    linesG.appendChild(core);
+    requestAnimationFrame(() => {
+      line.style.strokeDashoffset = 0;
+      core.style.strokeDashoffset = 0;
+    });
+    spawnSpark(A, B, 700);
+
+    const hit = [];
+    LETTERS.forEach(L => {
+      if (distPtSeg(L.x, L.y, A.x, A.y, B.x, B.y) <= TOL) hit.push(L);
+    });
+    hit.sort((p, q) => Math.hypot(p.x-A.x, p.y-A.y) - Math.hypot(q.x-A.x, q.y-A.y));
+    hit.forEach((L, i) => {
+      setTimeout(() => L._el.classList.add('lit'), 350 + i * 200);
+      drawOrder.push(L.c);
+    });
+
+    connections.push({ key:k, a:idA, b:idB, el:line, letters: hit.map(h=>h.c) });
+    A._g.classList.add('connected');
+    B._g.classList.add('connected');
+    setTimeout(updateAnswer, 350 + hit.length * 200 + 100);
+  }
+
+  function spawnSpark(A, B, duration = 700) {
+    const dot = ns('circle', { cx:A.x, cy:A.y, r:2.8, class:'spark' });
+    sparksG.appendChild(dot);
+    const start = performance.now();
+    function step(t) {
+      const k = Math.min(1, (t - start) / duration);
+      const x = A.x + (B.x - A.x) * k;
+      const y = A.y + (B.y - A.y) * k;
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', y);
+      dot.setAttribute('opacity', (1 - k * 0.6).toFixed(2));
+      if (k < 1) requestAnimationFrame(step);
+      else dot.remove();
+    }
+    requestAnimationFrame(step);
+  }
+
+  function updateAnswer() {
+    const litSet = new Set();
+    const ordered = [];
+    drawOrder.forEach(c => {
+      if (!litSet.has(c)) { litSet.add(c); ordered.push(c); }
+    });
+    answerEl.textContent = ordered.length ? ordered.join('') : '　';
+    const target = ['H','O','P','E'];
+    const isWin = litSet.size === 4 && target.every(c => litSet.has(c));
+    if (isWin) {
+      answerEl.textContent = 'HOPE';
+      coreEye.classList.add('on');
+      setTimeout(() => winEl.classList.add('show'), 700);
+    }
+  }
+
+  function reset() {
+    selected = null;
+    dragging = null;
+    suppressClick = false;
+    connections.length = 0;
+    drawOrder.length   = 0;
+    linesG.innerHTML   = '';
+    previewG.innerHTML = '';
+    sparksG.innerHTML  = '';
+    LETTERS.forEach(L => L._el.classList.remove('lit'));
+    ANCHORS.forEach(a => { a._g.classList.remove('selected'); a._g.classList.remove('connected'); });
+    answerEl.textContent = '　';
+    winEl.classList.remove('show');
+    coreEye.classList.remove('on');
+  }
+
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('restart').addEventListener('click', reset);
+})();
+</script>
+</body>
+</html>
