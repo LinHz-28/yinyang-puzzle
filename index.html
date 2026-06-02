@@ -210,23 +210,10 @@
     0%,100% { filter: drop-shadow(0 0 4px rgba(232,58,40,1))    drop-shadow(0 0 12px rgba(255,106,68,0.7)); }
     50%     { filter: drop-shadow(0 0 8px rgba(232,58,40,1))    drop-shadow(0 0 20px rgba(255,128,96,0.9)); }
   }
-  /* 過關時 HOPE 飄起 → 聚向中央 → 金光綻放 */
+  /* 過關時 HOPE 金光（位置與縮放由 JS 直接改 SVG transform） */
   .letter.lit.victory {
-    --dx: 0px;
-    --dy: 0px;
-    transform-box: fill-box;
-    transform-origin: center;
     fill: #ffe89a;
-    font-size: 26px;
-    animation:
-      victoryAssemble 2.8s cubic-bezier(.55,.1,.25,1) forwards,
-      goldGlow         1.8s ease-in-out infinite;
-  }
-  @keyframes victoryAssemble {
-    0%   { transform: translate(0, 0) scale(1); }
-    18%  { transform: translate(0, -14px) scale(1.25); }
-    45%  { transform: translate(0, -14px) scale(1.25); }
-    100% { transform: translate(var(--dx), var(--dy)) scale(1.85); }
+    animation: goldGlow 1.8s ease-in-out infinite;
   }
   @keyframes goldGlow {
     0%,100% {
@@ -243,7 +230,7 @@
         drop-shadow(0 0 60px rgba(255,150,40,0.7));
     }
   }
-  /* 過關時其它字母淡出，讓 HOPE 主舞台明顯 */
+  /* 過關時其它字母淡出 */
   .letter.dimmed {
     opacity: 0.10;
     transition: opacity 1s ease-out;
@@ -702,12 +689,17 @@
     a._g = g;
   });
 
-  // 字母
+  // 字母：用 <g transform="translate(x,y) scale(s)"> 包住 <text>，動畫直接改 g 的 transform 屬性
+  // 這比 CSS transform-box 更跨平台（手機 Safari/Chrome 都一致）
   LETTERS.forEach(L => {
-    const t = ns('text', { x:L.x, y:L.y, class:'letter', 'text-anchor':'middle', 'dominant-baseline':'central' });
+    const g = ns('g', { transform: `translate(${L.x} ${L.y}) scale(1)`, class: 'letter-g' });
+    const t = ns('text', { class:'letter', 'text-anchor':'middle', 'dominant-baseline':'central' });
     t.textContent = L.c;
-    lettersG.appendChild(t);
+    g.appendChild(t);
+    lettersG.appendChild(g);
+    L._g  = g;
     L._el = t;
+    L._tx = L.x; L._ty = L.y; L._ts = 1;  // 當前 transform 狀態
   });
 
   // 幾何
@@ -865,12 +857,12 @@
       answerEl.textContent = 'HOPE';
       coreEye.classList.add('on');
 
-      // 其它字母淡入背景，讓 HOPE 主舞台浮現
+      // 其它字母淡入背景
       LETTERS.forEach(L => {
         if (!['H','O','P','E'].includes(L.c)) L._el.classList.add('dimmed');
       });
 
-      // HOPE 四字聚向中央：先在原處騰起發金光，再緩緩飄至中央排列
+      // 動畫：每字「原地騰起+放大 → 飄至中央目標位+繼續放大」
       const CENTER_X = 200, CENTER_Y = 240, SPACING = 34;
       const order = ['H','O','P','E'];
       order.forEach((ch, i) => {
@@ -878,14 +870,46 @@
         if (!L) return;
         const targetX = CENTER_X + (i - (order.length - 1) / 2) * SPACING;
         const targetY = CENTER_Y;
-        L._el.style.setProperty('--dx', `${targetX - L.x}px`);
-        L._el.style.setProperty('--dy', `${targetY - L.y}px`);
-        setTimeout(() => L._el.classList.add('victory'), i * 280);
+        const startDelay = i * 260;
+
+        // 第 1 段：原地騰起 14px、放大 1.25
+        setTimeout(() => {
+          L._el.classList.add('victory');
+          tweenLetter(L, L.x, L.y - 14, 1.25, 500, easeOut);
+        }, startDelay);
+
+        // 第 2 段：飄至中央目標、放大 1.85
+        setTimeout(() => {
+          tweenLetter(L, targetX, targetY, 1.85, 1200, easeInOut);
+        }, startDelay + 800);
       });
 
       // 等四字全部聚成 HOPE 之後再彈出大字幕
       setTimeout(() => winEl.classList.add('show'), 4200);
     }
+  }
+
+  // 緩動函式
+  const easeOut   = t => 1 - (1 - t) * (1 - t);
+  const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+  // 用 rAF 把 L._g 的 transform 從目前狀態插值到目標 (tx, ty, scale)
+  function tweenLetter(L, toX, toY, toS, duration, easing) {
+    if (L._tween) cancelAnimationFrame(L._tween);
+    const fromX = L._tx, fromY = L._ty, fromS = L._ts;
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      const k = easing(t);
+      const x = fromX + (toX - fromX) * k;
+      const y = fromY + (toY - fromY) * k;
+      const s = fromS + (toS - fromS) * k;
+      L._g.setAttribute('transform', `translate(${x} ${y}) scale(${s})`);
+      L._tx = x; L._ty = y; L._ts = s;
+      if (t < 1) L._tween = requestAnimationFrame(step);
+      else      L._tween = null;
+    }
+    L._tween = requestAnimationFrame(step);
   }
 
   function reset() {
@@ -898,12 +922,12 @@
     previewG.innerHTML = '';
     sparksG.innerHTML  = '';
     LETTERS.forEach(L => {
+      if (L._tween) { cancelAnimationFrame(L._tween); L._tween = null; }
       L._el.classList.remove('lit');
       L._el.classList.remove('victory');
       L._el.classList.remove('dimmed');
-      L._el.style.animationDelay = '';
-      L._el.style.removeProperty('--dx');
-      L._el.style.removeProperty('--dy');
+      L._g.setAttribute('transform', `translate(${L.x} ${L.y}) scale(1)`);
+      L._tx = L.x; L._ty = L.y; L._ts = 1;
     });
     ANCHORS.forEach(a => { a._g.classList.remove('selected'); a._g.classList.remove('connected'); });
     answerEl.textContent = '　';
