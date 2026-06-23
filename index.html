@@ -333,6 +333,7 @@
   .win-overlay {
     position: absolute;
     inset: 0;
+    z-index: 60;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -410,6 +411,132 @@
     color: var(--red-3);
     border-color: var(--red-2);
   }
+
+  /* ───────── 開場說明卷 ───────── */
+  .intro-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: clamp(24px, 6vw, 44px) clamp(20px, 6vw, 40px);
+    border-radius: 6px;
+    background:
+      radial-gradient(circle at 50% 28%, rgba(200,40,31,0.16) 0%, transparent 52%),
+      radial-gradient(circle, rgba(22,11,6,0.975) 36%, rgba(8,4,2,0.99) 100%);
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    overflow: hidden;
+  }
+  .intro-overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .intro-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .intro-ring.r1 {
+    width: min(360px, 86%); aspect-ratio: 1;
+    border: 1px dashed rgba(212,166,101,0.28);
+    animation: rotate 60s linear infinite;
+  }
+  .intro-ring.r2 {
+    width: min(250px, 62%); aspect-ratio: 1;
+    border: 1px solid rgba(232,58,40,0.20);
+    animation: rotate 42s linear infinite reverse;
+  }
+
+  .intro-emblem {
+    width: 52px; height: 52px;
+    line-height: 49px;
+    border: 1.5px solid var(--red-2);
+    border-radius: 50%;
+    color: var(--red-3);
+    font-family: 'Ma Shan Zheng','Noto Serif TC',serif;
+    font-size: 26px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 16px rgba(232,58,40,0.4), inset 0 0 10px rgba(232,58,40,0.25);
+    text-shadow: 0 0 8px rgba(232,58,40,0.6);
+    position: relative;
+  }
+  .intro-label {
+    color: var(--amber-2);
+    font-size: clamp(11px, 3vw, 12px);
+    letter-spacing: 0.4em;
+    text-indent: 0.4em;
+    opacity: 0.85;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .intro-title {
+    font-family: 'Ma Shan Zheng','Noto Serif TC',serif;
+    color: var(--red-3);
+    font-size: clamp(28px, 8vw, 40px);
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    margin-bottom: 22px;
+    text-shadow: 0 0 16px rgba(232,58,40,0.6), 0 0 36px rgba(232,58,40,0.3);
+    position: relative;
+  }
+  .intro-body {
+    color: var(--cream);
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(15px, 4.2vw, 18px);
+    line-height: 2.05;
+    letter-spacing: 0.1em;
+    margin: 0 0 18px;
+    max-width: 24em;
+    position: relative;
+  }
+  .intro-body .hl {
+    color: var(--red-3);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-shadow: 0 0 10px rgba(232,58,40,0.6);
+  }
+  .intro-en {
+    color: var(--amber-2);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(11px, 3vw, 13px);
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+    margin: 0 0 28px;
+    max-width: 30em;
+    position: relative;
+  }
+  .intro-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+  }
+  .intro-actions button {
+    color: var(--amber-2);
+    border-color: var(--amber-1);
+    padding: 10px 22px;
+    font-size: 13px;
+  }
+  .intro-actions button:hover {
+    background: rgba(232,58,40,0.12);
+    color: var(--red-3);
+    border-color: var(--red-2);
+  }
+  .intro-actions button.primary {
+    color: var(--red-3);
+    border-color: var(--red-2);
+    box-shadow: 0 0 14px rgba(232,58,40,0.35), inset 0 0 12px rgba(232,58,40,0.18);
+    text-shadow: 0 0 8px rgba(232,58,40,0.5);
+  }
+  .intro-actions button.primary:hover {
+    background: rgba(232,58,40,0.22);
+    color: #ffd6a0;
+  }
 </style>
 </head>
 <body>
@@ -420,6 +547,49 @@
   <div class="brush-tag">
     <svg viewBox="0 0 24 24"><circle cx="5" cy="19" r="2.4" fill="#ff3a2a"/><path d="M5 19 L18 6" stroke="#e8c89a" stroke-width="1.8" stroke-linecap="round"/><path d="M17 5 L21 3 L19 7 Z" fill="#e8c89a"/></svg>
     朱 筆
+  </div>
+
+  <!-- ───── 開場 · 卷一：緣起 ───── -->
+  <div id="intro1" class="intro-overlay">
+    <div class="intro-ring r1"></div>
+    <div class="intro-ring r2"></div>
+    <div class="intro-emblem">符</div>
+    <div class="intro-label">卷 一 · 緣 起</div>
+    <div class="intro-title">淨 化 法 陣</div>
+    <p class="intro-body">
+      請於未來課表展覽，<br>
+      找尋這些魔力符號的連線方式，<br>
+      並將其連線完成，淨化法陣。
+    </p>
+    <p class="intro-en">
+      At the Future Curriculum Exhibition, seek the way these<br>
+      mystic runes connect — complete every line to purify the arcane circle.
+    </p>
+    <div class="intro-actions">
+      <button id="toPage2" type="button">翻啟下一頁 →</button>
+    </div>
+  </div>
+
+  <!-- ───── 開場 · 卷二：行法 ───── -->
+  <div id="intro2" class="intro-overlay hidden">
+    <div class="intro-ring r1"></div>
+    <div class="intro-ring r2"></div>
+    <div class="intro-emblem">令</div>
+    <div class="intro-label">卷 二 · 行 法</div>
+    <div class="intro-title">施 展 之 法</div>
+    <p class="intro-body">
+      請點擊下方「施展法陣」按鈕，<br>
+      回到遊戲畫面，<br>
+      連出最終答案 <span class="hl">HOPE</span>。
+    </p>
+    <p class="intro-en">
+      Tap the “Cast the Circle” button, return to the board,<br>
+      and trace the final answer — HOPE.
+    </p>
+    <div class="intro-actions">
+      <button id="backPage1" type="button">← 上一頁</button>
+      <button id="castBtn" class="primary" type="button">施展法陣 ✦</button>
+    </div>
   </div>
 
   <div class="title-row">食 妖 陰 陽 師</div>
@@ -937,6 +1107,22 @@
 
   document.getElementById('reset').addEventListener('click', reset);
   document.getElementById('restart').addEventListener('click', reset);
+
+  // ───────── 開場頁導覽 ─────────
+  const intro1 = document.getElementById('intro1');
+  const intro2 = document.getElementById('intro2');
+  document.getElementById('toPage2').addEventListener('click', () => {
+    intro1.classList.add('hidden');
+    intro2.classList.remove('hidden');
+  });
+  document.getElementById('backPage1').addEventListener('click', () => {
+    intro2.classList.add('hidden');
+    intro1.classList.remove('hidden');
+  });
+  document.getElementById('castBtn').addEventListener('click', () => {
+    // 施展法陣：收起說明卷，進入遊戲畫面
+    intro2.classList.add('hidden');
+  });
 })();
 </script>
 </body>
