@@ -399,7 +399,25 @@
     text-indent: 0.32em;
     opacity: 0.92;
     position: relative;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
+  }
+  .win-overlay .win-instr {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(13px, 3.4vw, 15px);
+    line-height: 1.95;
+    letter-spacing: 0.12em;
+    color: var(--cream);
+    opacity: 0.95;
+    max-width: 22em;
+    margin: 0 0 22px;
+    position: relative;
+  }
+  .win-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
   }
   .win-overlay button {
     color: var(--amber-2);
@@ -410,6 +428,16 @@
     background: rgba(232,58,40,0.18);
     color: var(--red-3);
     border-color: var(--red-2);
+  }
+  .win-overlay button.primary {
+    color: var(--red-3);
+    border-color: var(--red-2);
+    box-shadow: 0 0 14px rgba(232,58,40,0.4), inset 0 0 12px rgba(232,58,40,0.2);
+    text-shadow: 0 0 8px rgba(232,58,40,0.5);
+  }
+  .win-overlay button.primary:hover {
+    background: rgba(232,58,40,0.24);
+    color: #ffd6a0;
   }
 
   /* ───────── 開場說明卷 ───────── */
@@ -696,7 +724,14 @@
     <div class="hanzi">希望</div>
     <div class="en">HOPE</div>
     <div class="quote">執燈穿暗　引心向光</div>
-    <button id="restart" type="button">再啟符陣</button>
+    <p class="win-instr">
+      謹記此咒 ── 點擊下方按鈕，<br>
+      回到遊戲畫面，輸入最終答案。
+    </p>
+    <div class="win-actions">
+      <button id="backToGame" class="primary" type="button">← 回到遊戲畫面</button>
+      <button id="restart" type="button">再啟符陣</button>
+    </div>
   </div>
 </div>
 
@@ -1107,6 +1142,11 @@
 
   document.getElementById('reset').addEventListener('click', reset);
   document.getElementById('restart').addEventListener('click', reset);
+
+  // 回到遊戲畫面：返回瀏覽器上一頁（玩家原本由超連結進入）
+  document.getElementById('backToGame').addEventListener('click', () => {
+    history.back();
+  });
 
   // ───────── 開場頁導覽 ─────────
   const intro1 = document.getElementById('intro1');
